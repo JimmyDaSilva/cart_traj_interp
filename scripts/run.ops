@@ -13,3 +13,28 @@ stream("CartTrajInterp.TrajectoryIn",ros.comm.topic("move_group/result"))
 
 configureComponent("CartTrajInterp")
 startComponent("CartTrajInterp")
+
+
+
+ros.import("cart_opt_ctrl")
+
+loadComponent("CartOptCtrl","CartOptCtrl")
+
+
+setActivity("CartOptCtrl",0.001,HighestPriority-3,ORO_SCHED_RT)
+
+connectPeers("CartOptCtrl",getRobotName())
+
+
+// Connect JointPosition,Velocity,Torque and the correspoing *Command ports
+
+connectStandardPorts("CartOptCtrl",getRobotName(),ConnPolicy())
+
+stream("CartOptCtrl.PoseDesired",ros.comm.topic("CartOptCtrl/PoseDesired"))
+
+connectPeers("CartTrajInterp","CartOptCtrl")
+connect("CartTrajInterp.TrajectoryPointOut","CartOptCtrl.TrajectoryPointIn", ConnPolicy())
+
+
+configureComponent("CartOptCtrl")
+startComponent("CartOptCtrl")
