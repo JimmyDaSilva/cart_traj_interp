@@ -6,9 +6,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 find_package(catkin REQUIRED COMPONENTS
     rtt_ros
     rtt_ros_kdl_tools
+    trac_ik_lib
     kdl_conversions
     eigen_conversions
     cmake_modules
+    moveit_msgs
 )
 
 find_package(Eigen REQUIRED)

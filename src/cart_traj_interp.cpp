@@ -37,13 +37,14 @@ void CartTrajInterp::updateHook(){
   // If we get a new trajectory update it and start with point 0
   if(this->port_traj_in_.read(this->traj_in_) != RTT::NoData)
   {
-    RTT::log(RTT::Info) << "New trajectory" << RTT::endlog();
+    RTT::log(RTT::Warning) << "\n\n\n New trajectory \n\n\n" << RTT::endlog();
     this->traj_pt_nb_ = 0;
-  }  
+  }
 
   // Read the current state of the robot
   RTT::FlowStatus fp = this->port_joint_position_in_.read(this->joint_position_in_);
   RTT::FlowStatus fv = this->port_joint_velocity_in_.read(this->joint_velocity_in_);
+  RTT::FlowStatus ft = this->port_joint_velocity_in_.read(this->joint_velocity_in_);
   
   // Return if not giving anything (might happend during startup)
   if(fp == RTT::NoData || fv == RTT::NoData)
