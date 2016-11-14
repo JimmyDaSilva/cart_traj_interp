@@ -34,21 +34,21 @@ bool CartTrajInterp::configureHook(){
 
 void CartTrajInterp::updateHook(){
   
+  // Read the ports
+  RTT::FlowStatus ftraj = this->port_traj_in_.read(this->traj_in_);
+  RTT::FlowStatus fp = this->port_joint_position_in_.read(this->joint_position_in_);
+  RTT::FlowStatus fv = this->port_joint_velocity_in_.read(this->joint_velocity_in_);
+  
   // If we get a new trajectory update it and start with point 0
-  if(this->port_traj_in_.read(this->traj_in_) != RTT::NoData)
+  if(ftraj == RTT::NewData)
   {
-    RTT::log(RTT::Warning) << "\n\n\n New trajectory \n\n\n" << RTT::endlog();
+    RTT::log(RTT::Warning) << "\n\n\n New trajectory with "<<traj_in_.result.planned_trajectory.joint_trajectory.points.size() <<" points \n\n\n" << RTT::endlog();
     this->traj_pt_nb_ = 0;
   }
 
-  // Read the current state of the robot
-  RTT::FlowStatus fp = this->port_joint_position_in_.read(this->joint_position_in_);
-  RTT::FlowStatus fv = this->port_joint_velocity_in_.read(this->joint_velocity_in_);
-  RTT::FlowStatus ft = this->port_joint_velocity_in_.read(this->joint_velocity_in_);
-  
-  // Return if not giving anything (might happend during startup)
+  // Return if not giving any robot update (might happend during startup)
   if(fp == RTT::NoData || fv == RTT::NoData)
-    return;
+    return
   
   // Update the chain model
   this->arm_.setState(this->joint_position_in_,this->joint_velocity_in_);
@@ -56,13 +56,13 @@ void CartTrajInterp::updateHook(){
   
   // Check trajectory is not empty
   if (this->traj_in_.result.planned_trajectory.joint_trajectory.points.size() < 1){
-    RTT::log(RTT::Warning) << "Empty trajectory" << RTT::endlog();
+//     RTT::log(RTT::Warning) << "Empty trajectory" << RTT::endlog();
     return;
   }
   
   // Check trajectory is not finished
   if (this->traj_pt_nb_ > this->traj_in_.result.planned_trajectory.joint_trajectory.points.size() - 1){
-    RTT::log(RTT::Warning) << "All points in the current trajectory have been sent" << RTT::endlog();
+//     RTT::log(RTT::Warning) << "All points in the current trajectory have been sent" << RTT::endlog();
     return;
   }
   
@@ -80,9 +80,9 @@ void CartTrajInterp::updateHook(){
   pt_in_vel.qdot = this->pt_in_.qdot;
   KDL::Twist JdotQdot;
   
-  // If FK or JdotQdot solver fails start over
-  if ((this->fk_solver_vel_->JntToCart(pt_in_vel, traj_pt_vel) > 0) &&  (this->jntToJacDotSolver_->JntToJacDot(pt_in_vel, JdotQdot) == 0) ){
-      
+  // If FK or JdotQdot solver fails start over 
+  if ((this->fk_solver_vel_->JntToCart(pt_in_vel, traj_pt_vel) == 0) &&  (this->jntToJacDotSolver_->JntToJacDot(pt_in_vel, JdotQdot) == 0) ){
+        
     KDL::Jacobian J = this->arm_.getJacobian();
     KDL::Twist xdotdot;
     
@@ -97,6 +97,8 @@ void CartTrajInterp::updateHook(){
 
     // Increment counter
     this->traj_pt_nb_++;
+    
+    RTT::log(RTT::Warning) << "Sending point "<< this->traj_pt_nb_ << RTT::endlog();
   }
   
 }
