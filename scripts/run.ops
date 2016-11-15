@@ -1,40 +1,43 @@
+// Import base script
 import("rtt_rospack")
-runScript(ros.find("lwr_moveit_config")+"/scripts/run.ops")
+runScript(ros.find("lwr_utils")+"/scripts/utils.ops")
 
-import("rtt_roscomm")
+// Load robot
+loadRobot(getRobotName(),isSim(),true)
+loadStatePublisher(true)
+
+// Set initial robot configuration
+setRobotInitialJointConfiguration(0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+setJointTorqueControlMode()
+
+
+// Load interpolator component
 ros.import("cart_traj_interp")
 loadComponent("CartTrajInterp","CartTrajInterp")
 setActivity("CartTrajInterp",0.001,HighestPriority-3,ORO_SCHED_RT)
 
+// Connect interpolator
 connectPeers("CartTrajInterp",getRobotName())
 connectStandardPorts("CartTrajInterp",getRobotName(),ConnPolicy())
-
 stream("CartTrajInterp.TrajectoryIn",ros.comm.topic("move_group/result"))
 
+// Configure & start interpolator
 configureComponent("CartTrajInterp")
 startComponent("CartTrajInterp")
 
 
-
+// Load controller component
 ros.import("cart_opt_ctrl")
-
 loadComponent("CartOptCtrl","CartOptCtrl")
-
-
 setActivity("CartOptCtrl",0.001,HighestPriority-3,ORO_SCHED_RT)
 
+// Connect controller
 connectPeers("CartOptCtrl",getRobotName())
-
-
-// Connect JointPosition,Velocity,Torque and the correspoing *Command ports
-
 connectStandardPorts("CartOptCtrl",getRobotName(),ConnPolicy())
-
 stream("CartOptCtrl.PoseDesired",ros.comm.topic("CartOptCtrl/PoseDesired"))
-
 connectPeers("CartTrajInterp","CartOptCtrl")
 connect("CartTrajInterp.TrajectoryPointOut","CartOptCtrl.TrajectoryPointIn", ConnPolicy())
 
-
+// Configure & start controller
 configureComponent("CartOptCtrl")
 startComponent("CartOptCtrl")
