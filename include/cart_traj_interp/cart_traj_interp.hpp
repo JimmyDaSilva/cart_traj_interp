@@ -33,6 +33,7 @@ protected:
   
   // Output ports
   RTT::OutputPort<KDL::FrameAcc> port_traj_pt_out_;
+  RTT::OutputPort<KDL::JntArrayAcc> port_traj_joint_out_;
   
   // Chain utils
   rtt_ros_kdl_tools::ChainUtils arm_;

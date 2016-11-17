@@ -5,6 +5,7 @@ CartTrajInterp::CartTrajInterp(std::string const& name) : TaskContext(name){
   this->addPort("JointPosition",this->port_joint_position_in_);
   this->addPort("JointVelocity",this->port_joint_velocity_in_);
   this->addPort("TrajectoryPointOut",this->port_traj_pt_out_);
+  this->addPort("TrajectoryJointOut",this->port_traj_joint_out_);
 }
 
 bool CartTrajInterp::configureHook(){
@@ -94,11 +95,11 @@ void CartTrajInterp::updateHook(){
     
     // Send cartesian trajectory point to the controller
     this->port_traj_pt_out_.write(this->traj_pt_out_);
+    this->port_traj_joint_out_.write(this->pt_in_);
 
     // Increment counter
     this->traj_pt_nb_++;
     
-    RTT::log(RTT::Warning) << "Sending point "<< this->traj_pt_nb_ << RTT::endlog();
   }
   
 }

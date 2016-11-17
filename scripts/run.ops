@@ -37,6 +37,7 @@ connectStandardPorts("CartOptCtrl",getRobotName(),ConnPolicy())
 stream("CartOptCtrl.PoseDesired",ros.comm.topic("CartOptCtrl/PoseDesired"))
 connectPeers("CartTrajInterp","CartOptCtrl")
 connect("CartTrajInterp.TrajectoryPointOut","CartOptCtrl.TrajectoryPointIn", ConnPolicy())
+connect("CartTrajInterp.TrajectoryJointOut","CartOptCtrl.TrajectoryJointIn", ConnPolicy())
 
 // Configure & start controller
 configureComponent("CartOptCtrl")
