@@ -28,7 +28,12 @@
 
     <arg name="spawn_ros_controllers" default="joint_state_controller joint_trajectory_controller"/>
     
-    <!-- The parameters that the CartOptCtrl sensor will get -->
+    <!-- The parameters for the CartTrajInterp component -->
+    <rosparam ns="CartTrajInterp" subst_value="true">
+        SampleDuration : 0.001
+    </rosparam>
+    
+    <!-- The parameters for the CartOptCtrl component -->
     <rosparam ns="CartOptCtrl" subst_value="true">
         P_gain : [1000,1000,1000,300,300,300]
         D_gain : [50,50,50,10,10,10]
