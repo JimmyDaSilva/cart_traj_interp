@@ -5,14 +5,14 @@ runScript(ros.find("lwr_utils")+"/scripts/utils.ops")
 // Load robot
 loadRobot(getRobotName(),isSim(),true)
 loadStatePublisher(true)
+loadROSControl(true)
 
 // Set initial robot configuration
 setRobotInitialJointConfiguration(0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 setJointTorqueControlMode()
 
-
 // Load interpolator component
-ros.import("cart_traj_interp")
+ros.import("cart_opt_ctrl")
 loadComponent("CartTrajInterp","CartTrajInterp")
 setActivity("CartTrajInterp",0.001,HighestPriority-3,ORO_SCHED_RT)
 
@@ -25,9 +25,7 @@ stream("CartTrajInterp.TrajectoryIn",ros.comm.topic("move_group/result"))
 configureComponent("CartTrajInterp")
 startComponent("CartTrajInterp")
 
-
 // Load controller component
-ros.import("cart_opt_ctrl")
 loadComponent("CartOptCtrl","CartOptCtrl")
 setActivity("CartOptCtrl",0.001,HighestPriority-3,ORO_SCHED_RT)
 
